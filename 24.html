@@ -1,0 +1,89 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+	canvas {
+	  border: 1px solid black;
+		background-color: white;
+	}
+.main_button {
+	font-size: 18px;
+	margin-right: 10px;
+}
+</style>
+	</head>
+	<body>
+		<button class="main_button" onclick="init()">Draw</button>
+		<button class="main_button" onclick="finish_animation()">Finish</button>
+		<button class="main_button" onclick="clear_canvas()">Clear</button>
+		<!--
+		<button onclick="finish_animation()">FINISH</button>
+		<button onclick="deaccelerate()" style="margin-left: 10px;">-</button>
+		<button onclick="accelerate()">+</button>
+		-->
+		<br><br>
+		<canvas id="tutorial"></canvas>
+	</body>
+<script>
+	let color = 'black';
+	let ray = 25;
+	let x, y;
+	let x_change, y_change, angle;
+	let max_frames, distance_per_frame;
+	let animationID;
+	let canvas_width=1500, canvas_height=800;
+	const canvas = document.getElementById('tutorial');
+	canvas.width = canvas_width;
+	canvas.height = canvas_height;
+	const ctx = canvas.getContext('2d');
+
+	function init()
+	{
+		if(animationID)
+			cancelAnimationFrame(animationID);
+		x = 200;
+		y = 200;
+		max_frames = 90;
+		distance_per_frame = Math.sqrt(Math.pow(canvas_width, 2) + Math.pow(canvas_height, 2)) / max_frames;
+		angle = Math.floor(Math.random() * 360);
+		console.log(angle);
+		x_change = (x + distance_per_frame * Math.cos((angle - 90) * Math.PI / 180)) - x;
+		y_change = (y + distance_per_frame * Math.sin((angle - 90) * Math.PI / 180)) - y;
+		animationID = requestAnimationFrame(draw);
+	}
+
+	function draw()
+	{
+		ctx.canvas.width = ctx.canvas.width;
+		ctx.fillStyle = color;
+		ctx.strokeStyle = color;
+		ctx.beginPath();
+		ctx.moveTo(0, 100);           // Create a starting point
+		ctx.lineTo(100, 100);          // Create a horizontal line
+		ctx.stroke();
+		//ctx.arcTo(100, 70, 100, 130, 40);
+		ctx.arc(150, 123, 50, Math.PI + (30 * (Math.PI / 180)), 0 - (30 * (Math.PI / 180)));
+		//ctx.arcTo(100, 70, 100, 70, 50);
+		//ctx.arcTo(150, 50, 150, 80, 50); // Create an arc
+		//ctx.lineTo(170, 120);         // Continue with vertical line
+		ctx.stroke();                // Draw it
+		//ctx.fill();
+		//animationID = requestAnimationFrame(draw);
+	}
+
+	function finish_animation()
+	{
+		if(animationID) {
+			cancelAnimationFrame(animationID);
+			ctx.canvas.width = ctx.canvas.width;
+		}
+	}
+
+	function clear_canvas()
+	{
+		//ctx.canvas.width = ctx.canvas.width;
+		ctx.clearRect(0, 0, canvas_width, canvas_height);
+	}
+
+</script>
+</html>

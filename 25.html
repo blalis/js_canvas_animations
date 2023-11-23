@@ -1,0 +1,112 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+	canvas {
+	  border: 1px solid black;
+		background-color: white;
+	}
+.main_button {
+	font-size: 18px;
+	margin-right: 10px;
+}
+</style>
+	</head>
+	<body>
+		<button class="main_button" onclick="init()">Draw</button>
+		<button class="main_button" onclick="finish_animation()">Finish</button>
+		<button class="main_button" onclick="clear_canvas()">Clear</button>
+		<!--
+		<button onclick="finish_animation()">FINISH</button>
+		<button onclick="deaccelerate()" style="margin-left: 10px;">-</button>
+		<button onclick="accelerate()">+</button>
+		-->
+		<br><br>
+		<canvas id="tutorial"></canvas>
+	</body>
+<script>
+	let submarine_color = 'black', submarine_width = 350, submarine_height = 55,
+	submarine_cabin_x = 100, submarine_cabin_height = 9, submarine_cabin_width = 65, submarine_cone = 40,
+	submarine_steering_wheel = submarine_height / 3;
+	let water_color = 'blue', sand_color = 'yellow';
+	let x, y;
+	let x_change, y_change, angle;
+	let max_frames, distance_per_frame;
+	let animationID;
+	let canvas_width=1500, canvas_height=800;
+	const canvas = document.getElementById('tutorial');
+	canvas.width = canvas_width;
+	canvas.height = canvas_height;
+	const ctx = canvas.getContext('2d');
+
+	function init()
+	{
+		if(animationID)
+			cancelAnimationFrame(animationID);
+		x = 1000;
+		y = canvas_height - 100;
+		max_frames = 90;
+		distance_per_frame = Math.sqrt(Math.pow(canvas_width, 2) + Math.pow(canvas_height, 2)) / max_frames;
+		angle = Math.floor(Math.random() * 360);
+		console.log(angle);
+		x_change = (x + distance_per_frame * Math.cos((angle - 90) * Math.PI / 180)) - x;
+		y_change = (y + distance_per_frame * Math.sin((angle - 90) * Math.PI / 180)) - y;
+		animationID = requestAnimationFrame(draw);
+	}
+
+	function draw()
+	{
+	//let submarine_color = 'black', submarine_width = 100, submarine_height = 15,
+	//submarine_dome = 10, submarine_cone = 20;
+		ctx.canvas.width = ctx.canvas.width;
+		ctx.fillStyle = water_color;
+		ctx.strokeStyle = water_color;
+		ctx.beginPath();
+		ctx.rect(0, 70, canvas_width, canvas_height);
+		ctx.stroke();
+		ctx.fill();
+		ctx.beginPath();
+		ctx.rect(0, canvas_height - 20, canvas_width, 20);
+		ctx.fillStyle = sand_color;
+		ctx.strokeStyle = sand_color;
+		ctx.stroke();
+		ctx.fill();
+		draw_submarine();
+		//animationID = requestAnimationFrame(draw);
+	}
+
+	function draw_submarine()
+	{
+		ctx.fillStyle = submarine_color;
+		ctx.strokeStyle = submarine_color;
+		ctx.beginPath();
+		ctx.arc(x + submarine_height / 2, y, submarine_height / 2, 90 * (Math.PI / 180), 270 * (Math.PI / 180));
+		ctx.rect(x + submarine_height / 2, y - submarine_height / 2, submarine_width, submarine_height);
+		ctx.rect(x + submarine_cabin_x, y - submarine_height / 2 - submarine_cabin_height, submarine_cabin_width, submarine_cabin_height);
+		ctx.moveTo(x + submarine_width + (submarine_height / 2), y - submarine_height / 2);
+		ctx.lineTo(x + submarine_width + (submarine_height / 2) + submarine_cone, y - (submarine_steering_wheel / 2));
+		ctx.lineTo(x + submarine_width + (submarine_height / 2) + submarine_cone, y + (submarine_steering_wheel / 2));
+		ctx.lineTo(x + submarine_width + (submarine_height / 2), y + submarine_height / 2);
+		ctx.moveTo(x + submarine_width + (submarine_height / 2) + submarine_cone, y);
+		ctx.lineTo(x + submarine_width + (submarine_height / 2) + submarine_cone + 10, y);
+		ctx.rect(x + submarine_width + (submarine_height / 2) + submarine_cone + 5, y - (submarine_steering_wheel / 2), 5, submarine_steering_wheel);
+		ctx.stroke();                // Draw it
+		ctx.fill();
+	}
+
+	function finish_animation()
+	{
+		if(animationID) {
+			cancelAnimationFrame(animationID);
+			ctx.canvas.width = ctx.canvas.width;
+		}
+	}
+
+	function clear_canvas()
+	{
+		//ctx.canvas.width = ctx.canvas.width;
+		ctx.clearRect(0, 0, canvas_width, canvas_height);
+	}
+
+</script>
+</html>

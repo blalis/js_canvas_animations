@@ -1,0 +1,46 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<style>
+				#tutorial {
+					border: solid 1px black;
+				}
+		</style>
+	</head>
+	<body>
+		<canvas id="tutorial" width="500" height="100"></canvas>
+	</body>
+	<script>
+		let posx = 0;
+		let animationID;
+
+		function init() {
+		  let animationID = requestAnimationFrame(animate);
+		}
+
+		function animate(animation=true) {
+			let animID;
+			let jump = 5;
+			let canvas = document.getElementById('tutorial');
+			let ctx = canvas.getContext('2d');
+			ctx.canvas.width = ctx.canvas.width;
+			ctx.fillStyle = "blue";
+			ctx.fillRect(posx, 0, 50, 100);
+			if(animation == false) {
+				return 0;
+			}
+			if((posx + jump + 50) <= 500) {
+				posx += jump;
+				animID = requestAnimationFrame(animate);
+			}
+			else {
+				cancelAnimationFrame(animID);
+				cancelAnimationFrame(animationID);
+				posx = 0;
+				animate(animation=false);
+			}
+		}
+
+		init();
+	</script>
+</html>

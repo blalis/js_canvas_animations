@@ -1,0 +1,208 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+	canvas {
+	  border: 1px solid black;
+		background-color: white;
+	}
+.main_button {
+	font-size: 16px;
+	width: 40px;
+	margin-right:0px;
+}
+</style>
+	</head>
+	<body>
+		<button class="main_button" onclick="move('NW')">NW</button>
+		<button class="main_button" onclick="move('N')">N</button>
+		<button class="main_button" onclick="move('NE')">NE</button>
+		<br>
+		<button class="main_button" onclick="move('W')">W</button>
+		<button class="main_button" onclick="move('C')">C</button>
+		<button class="main_button" onclick="move('E')">E</button>
+		<br>
+		<button class="main_button" onclick="move('SW')">SW</button>
+		<button class="main_button" onclick="move('S')">S</button>
+		<button class="main_button" onclick="move('SE')">SE</button>
+		<!--
+		<button class="main_button" onclick="finish_animation()">Finish</button>
+		<button class="main_button" onclick="clear_canvas()">Clear</button>
+		-->
+		<!--
+		<button onclick="finish_animation()">FINISH</button>
+		<button onclick="deaccelerate()" style="margin-left: 10px;">-</button>
+		<button onclick="accelerate()">+</button>
+		-->
+		<br><br>
+		<canvas id="tutorial"></canvas>
+	</body>
+<script>
+	let canvas_width=1500, canvas_height=800;
+	let submarine_color = 'black', submarine_width = 250, submarine_height = 40,
+	submarine_cabin_x = 70, submarine_cabin_height = 7, submarine_cabin_width = 50, submarine_cone = 30,
+	submarine_steering_wheel = submarine_height / 3;
+	let water_color = '#1ca3ec', sand_color = 'yellow';
+	let water_level = canvas_height - 70, sand_level = 20;
+	let x = canvas_width - 500, y = canvas_height - 60;
+	let x_change, y_change, angle;
+	let max_frames, distance_per_frame;
+	let animationID;
+	const canvas = document.getElementById('tutorial');
+	canvas.width = canvas_width;
+	canvas.height = canvas_height;
+	const ctx = canvas.getContext('2d');
+
+	max_frames = 90;
+	distance_per_frame = Math.sqrt(Math.pow(canvas_width, 2) + Math.pow(canvas_height, 2)) / max_frames;
+
+	draw();
+	window.addEventListener("keydown", keycontrol);
+
+	function move(direction)
+	{
+		switch(direction) {
+			case 'N':
+				angle = 0 - 90;
+				break;
+			case 'NE':
+				angle = 0 - 45;
+				break;
+			case 'E':
+				angle = 0;
+				break;
+			case 'SE':
+				angle = 0 + 45;
+				break;
+			case 'S':
+				angle = 0 + 90;
+				break;
+			case 'SW':
+				angle = 0 + 135;
+				break;
+			case 'W':
+				angle = 0 + 180;
+				break;
+			case 'NW':
+				angle = 0 + 225;
+				break;
+			default:
+				return 1;
+		}
+		x_change = (x + distance_per_frame * Math.cos(angle * (Math.PI / 180))) - x;
+		y_change = (y + distance_per_frame * Math.sin(angle * (Math.PI / 180))) - y;
+		x += x_change;
+		y += y_change;
+		if(y > (canvas_height - sand_level - Math.ceil(submarine_height / 2)))
+			y = canvas_height - sand_level - Math.ceil(submarine_height / 2);
+		if(y < (canvas_height - water_level + (submarine_steering_wheel / 2)))
+			y = canvas_height - water_level + (submarine_steering_wheel / 2);
+		if(x > (canvas_width - submarine_width))
+			x = canvas_width - submarine_width;
+		if(x < 0)
+			x = 0;
+		draw();
+	}
+
+	function draw()
+	{
+		ctx.canvas.width = ctx.canvas.width;
+		ctx.fillStyle = water_color;
+		ctx.strokeStyle = water_color;
+		ctx.beginPath();
+		ctx.rect(0, canvas_height - water_level, canvas_width, canvas_height);
+		ctx.stroke();
+		ctx.fill();
+		ctx.beginPath();
+		ctx.rect(0, canvas_height - sand_level, canvas_width, sand_level);
+		ctx.fillStyle = sand_color;
+		ctx.strokeStyle = sand_color;
+		ctx.stroke();
+		ctx.fill();
+		draw_submarine();
+		//animationID = requestAnimationFrame(draw);
+	}
+
+	function draw_submarine()
+	{
+		ctx.fillStyle = submarine_color;
+		ctx.strokeStyle = submarine_color;
+		ctx.beginPath();
+		ctx.arc(x + submarine_height / 2, y, submarine_height / 2, 90 * (Math.PI / 180), 270 * (Math.PI / 180));
+		ctx.rect(x + submarine_height / 2, y - submarine_height / 2, submarine_width, submarine_height);
+		ctx.rect(x + submarine_cabin_x, y - submarine_height / 2 - submarine_cabin_height, submarine_cabin_width, submarine_cabin_height);
+		ctx.moveTo(x + submarine_width + (submarine_height / 2), y - submarine_height / 2);
+		ctx.lineTo(x + submarine_width + (submarine_height / 2) + submarine_cone, y - (submarine_steering_wheel / 2));
+		ctx.lineTo(x + submarine_width + (submarine_height / 2) + submarine_cone, y + (submarine_steering_wheel / 2));
+		ctx.lineTo(x + submarine_width + (submarine_height / 2), y + submarine_height / 2);
+		ctx.moveTo(x + submarine_width + (submarine_height / 2) + submarine_cone, y);
+		ctx.lineTo(x + submarine_width + (submarine_height / 2) + submarine_cone + 10, y);
+		ctx.rect(x + submarine_width + (submarine_height / 2) + submarine_cone + 5, y - (submarine_steering_wheel / 2), 3, submarine_steering_wheel);
+		ctx.stroke();                // Draw it
+		ctx.fill();
+	}
+
+	function keycontrol(event){
+		/*
+	  //const key = event.keyCode;
+		if( arrow_control_switch == 0 || arrow_current_position == null )
+			return 0;
+		*/
+		/*
+		console.log(event.key);
+		console.log(event.code);
+		*/
+	  const key = event.code;
+	  switch( key ){
+	    case 'Enter':
+	      break;
+	    case 'ArrowLeft':
+	      move('W');
+	      break;
+	    case 'ArrowUp':
+	      move('N');
+	      break;
+	    case 'ArrowRight':
+	      move('E');
+	      break;
+	    case 'ArrowDown':
+	      move('S');
+	      break;
+	    case 'Numpad8':
+	      move('N');
+	      break;
+	    case 'Numpad9':
+	      move('NE');
+	      break;
+	    case 'Numpad6':
+	      move('E');
+	      break;
+	    case 'Numpad3':
+	      move('SE');
+	      break;
+	    case 'Numpad2':
+	      move('S');
+	      break;
+	    case 'Numpad1':
+	      move('SW');
+	      break;
+	    case 'Numpad4':
+	      move('W');
+	      break;
+	    case 'Numpad7':
+	      move('NW');
+	      break;
+	    case 'Numpad5':
+	      //move('S');
+	      break;
+	  }
+	}
+
+	function clear_canvas()
+	{
+		//ctx.canvas.width = ctx.canvas.width;
+		ctx.clearRect(0, 0, canvas_width, canvas_height);
+	}
+
+</script>
+</html>

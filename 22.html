@@ -1,0 +1,199 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+	canvas {
+	  border: 1px solid black;
+		background-color: black;
+	}
+	.main_button {
+		font-size: 18px;
+		margin-right: 10px;
+	}
+	.main_button_no_margin {
+		font-size: 18px;
+	}
+	#angle_text_input {
+		width: 50px;
+		font-size: 18px;
+	}
+</style>
+	</head>
+	<body>
+		<button class="main_button" onclick="init()">Draw</button>
+		<button class="main_button" onclick="finish()">Finish</button>
+		<button class="main_button" onclick="clear_canvas()">Clear</button>
+		<input type="text" id="angle_text_input"/>
+		<button class="main_button" onclick="check_angle()">Check angle</button>
+		SPEED
+		<button class="main_button_no_margin" onclick="decrease_speed()">-</button>
+		<button class="main_button" onclick="increase_speed()">+</button>
+		<input type="text" id="angle_text_input"/>
+		<button class="main_button" onclick="check_speed()">Check speed</button>
+		<!--
+		<button onclick="finish_animation()">FINISH</button>
+		<button onclick="deaccelerate()" style="margin-left: 10px;">-</button>
+		<button onclick="accelerate()">+</button>
+		-->
+		<br><br>
+		<canvas id="tutorial"></canvas>
+	</body>
+<script>
+	let canvas_width=1000, canvas_height=800;
+	const canvas = document.getElementById('tutorial');
+	canvas.width = canvas_width;
+	canvas.height = canvas_height;
+	const ctx = canvas.getContext('2d');
+
+	let ball_ray = 25, ball_color = 'white';
+	let x, y, angle, relative_angle;
+	let animationID, max_frames;
+	let distance_per_frame, x_change, y_change;
+	//animationID = requestAnimationFrame(draw);
+
+	function init(angle_value='')
+	{
+		cancel_animation();
+		x = canvas_width / 2;
+		y = canvas_height / 2;
+		if(angle_value !== '')
+			angle = angle_value;
+		else
+			angle = Math.floor(Math.random() * 360);
+		console.log('init: ' + angle);
+		max_frames = 90;
+		distance_per_frame = Math.sqrt(Math.pow(canvas_width, 2) + Math.pow(canvas_height, 2)) / max_frames;
+		calculate_x_y_change(angle);
+		animationID = requestAnimationFrame(draw);
+	}
+
+	function draw()
+	{
+		ctx.canvas.width = ctx.canvas.width;
+		ctx.fillStyle = ball_color;
+		ctx.strokeStyle = ball_color;
+		ctx.beginPath();
+		ctx.arc(x, y, ball_ray, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		x += x_change;
+		y += y_change;
+		if(y <= 0) {
+			relative_angle = get_wall_relative_angle(angle, 'N');
+			//y = 0 + ball_ray;
+		}
+		else if(x >= canvas_width) {
+			relative_angle = get_wall_relative_angle(angle, 'E');
+			//x = canvas_width - ball_ray;
+		}
+		else if(y >= canvas_height) {
+			relative_angle = get_wall_relative_angle(angle, 'S');
+			//y = canvas_height - ball_ray;
+		}
+		else if(x <= 0) {
+			relative_angle = get_wall_relative_angle(angle, 'W');
+			//x = 0 + ball_ray;
+		}
+		else
+			relative_angle = '';
+		if(relative_angle !== '') {
+			angle += 180 - (2 * relative_angle);
+			angle = angle % 360;
+			//console.log('relative: ' + relative_angle);
+			//console.log('angle: ' + angle);
+			calculate_x_y_change(angle);
+		}
+		animationID = requestAnimationFrame(draw);
+	}
+
+	function calculate_x_y_change(angle)
+	{
+		x_change = (x + distance_per_frame * Math.cos(angle * Math.PI / 180)) - x;
+		y_change = (y + distance_per_frame * Math.sin(angle * Math.PI / 180)) - y;
+	}
+
+	function get_wall_relative_angle(angle, wall)
+	{
+		return angle - get_direction_angle(wall);
+	}
+
+	function get_all_walls_relative_angles(angle)
+	{
+		for(const wall of ['N', 'E', 'S', 'W']) {
+			console.log(wall + ': ' + (angle - get_direction_angle(wall)));
+		}
+	}
+
+	function get_all_directions_relative_angles(angle)
+	{
+		for(const direction of ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']) {
+			console.log(direction + ': ' + (angle - get_direction_angle(direction)));
+		}
+	}
+
+	function get_direction_angle(direction)
+	{
+		switch(direction) {
+			case 'N':
+				return 0 - 90;
+				break;
+			case 'NE':
+				return 0 - 45;
+				break;
+			case 'E':
+				return 0;
+				break;
+			case 'SE':
+				return 0 + 45;
+				break;
+			case 'S':
+				return 0 + 90;
+				break;
+			case 'SW':
+				return 0 + 135;
+				break;
+			case 'W':
+				return 0 + 180;
+				break;
+			case 'NW':
+				return 0 + 225;
+				break;
+			default:
+				return '';
+				break;
+		}
+	}
+
+	function cancel_animation()
+	{
+		if(animationID)
+			cancelAnimationFrame(animationID);
+	}
+
+	function clear_canvas()
+	{
+		//ctx.canvas.width = ctx.canvas.width;
+		ctx.clearRect(0, 0, canvas_width, canvas_height);
+		star_x = [];
+	  star_y = [];
+	}
+
+	function finish()
+	{
+		cancel_animation();
+		clear_canvas();
+	}
+
+	function check_angle()
+	{
+		let angle_text_field = document.getElementById("angle_text_input");
+		let angle = angle_text_field.value;
+		if(! angle.match(/^-?[0-9]+$/)) {
+			alert("Incorrect angle");
+			return 1;
+		}
+		angle = angle % 360;
+		init(angle_value=angle);
+	}
+</script>
+</html>

@@ -1,0 +1,151 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+	canvas {
+	  border: 1px solid black;
+		background-color: black;
+	}
+.main_button {
+	font-size: 18px;
+	margin-right: 10px;
+}
+</style>
+	</head>
+	<body>
+		<button class="main_button" onclick="draw_total_random(fixed_star_number=false, total_random=true)">Total Random</button>
+		<button class="main_button" onclick="draw_total_random(fixed_star_number=true, total_random=true)">Total Random, fixed num</button>
+		<button class="main_button" onclick="draw_total_random(fixed_star_number=false, total_random=false)">Unique Random</button>
+		<button class="main_button" onclick="draw_total_random(fixed_star_number=true, total_number=false)">Unique Random, fixed num</button>
+		<button class="main_button" onclick="clear_canvas()">Clear</button>
+		<input type="text" class="main_button" id="star_num" value="500"/>
+		<!--
+		<button onclick="finish_animation()">FINISH</button>
+		<button onclick="deaccelerate()" style="margin-left: 10px;">-</button>
+		<button onclick="accelerate()">+</button>
+		-->
+		<br><br>
+		<canvas id="tutorial"></canvas>
+	</body>
+<script>
+	let star_x = [], star_y = [];
+	let canvas_width = 1000, canvas_height = 800;
+	const canvas = document.getElementById('tutorial');
+	canvas.width = canvas_width;
+	canvas.height = canvas_height;
+	const ctx = canvas.getContext('2d');
+
+	function generate_star_coordinates_usinng_total_random(fixed_star_number, total_random)
+	{
+		let number_of_stars = 1000 / 1.5;
+		let x, y;
+		let count = 0;
+		let star_num_input;
+
+		if(fixed_star_number == true) {
+			star_num_input = document.getElementById("star_num").value;
+			if(star_num_input.match(/^[0-9]+$/))
+				number_of_stars = star_num_input;
+			else {
+				alert("Not a correct number");
+				return 1;
+			}
+			if(number_of_stars > 20000)
+				number_of_stars = 20000;
+		}
+		else
+			number_of_stars = Math.random() * 2000;
+
+		if(total_random == true) {
+			while(count < number_of_stars) {
+				x = Math.random() * canvas_width;
+				y = Math.random() * canvas_height;
+				star_x.push(x);
+				star_y.push(y);
+				count++;
+			}
+		}
+		else {
+			while(count < number_of_stars) {
+				do
+				{
+					x = Math.random() * canvas_width;
+					y = Math.random() * canvas_height;
+				}while(check_if_coordinates_are_used(x, y) != 0);
+				star_x.push(x);
+				star_y.push(y);
+				count++;
+			}
+		}
+		return 0;
+	}
+
+	function generate_random_star_coordinates()
+	{
+		let number_of_stars = 1000;
+		let x, y;
+		let count = 0;
+		while(count < number_of_stars) {
+			x = Math.random() * canvas_width;
+			y = Math.random() * canvas_height;
+			star_x.push(x);
+			star_y.push(y);
+			count++;
+		}
+	}
+
+	function check_if_coordinates_are_used(x, y)
+	{
+		for(let i=0;i<star_x.length;i++) {
+			if(x == star_x[i] && y == star_y[i])
+				return 1;
+		}
+		return 0;
+	}
+
+	function generate_stars()
+	{
+		let star_color = 'white';
+		ctx.canvas.width = ctx.canvas.width;
+		for(let i=0;i<star_x.length;i++) {
+			ctx.beginPath();
+			ctx.arc(star_x[i], star_y[i], 1, 0, 2 * Math.PI);
+			ctx.fillStyle = star_color;
+			ctx.strokeStyle = star_color;
+			ctx.stroke();
+			ctx.fill();
+		}
+	}
+
+	function draw_total_random(fixed_star_number=false, total_random=true)
+	{
+		//clear();
+		let result;
+		star_x = [];
+	  star_y = [];
+		if(fixed_star_number == false) {
+			if(total_random == true)
+				result = generate_star_coordinates_usinng_total_random(fixed_star_number=false, total_random=true);
+			else
+				result = generate_star_coordinates_usinng_total_random(fixed_star_number=false, total_random=false);
+		}
+		else {
+			if(total_random == true)
+				result = generate_star_coordinates_usinng_total_random(fixed_star_number=true, total_random=true);
+			else
+				result = generate_star_coordinates_usinng_total_random(fixed_star_number=true, total_random=false);
+		}
+		if(result == 0)
+			generate_stars();
+	}
+
+	function clear_canvas()
+	{
+		//ctx.canvas.width = ctx.canvas.width;
+		ctx.clearRect(0, 0, canvas_width, canvas_height);
+		star_x = [];
+	  star_y = [];
+	}
+
+</script>
+</html>

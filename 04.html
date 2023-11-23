@@ -1,0 +1,50 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<style>
+			#tutorial {
+				border: solid 1px black;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="tutorial" width="500" height="500">TEST</canvas>
+	</body>
+	<script>
+		let animationID;
+		let ray = 50;
+		let round = 0;
+
+		function run() {
+			animationID = requestAnimationFrame(animate);
+		}
+
+		function animate() {
+			let canvas = document.getElementById('tutorial');
+			let ctx = canvas.getContext('2d');
+			ctx.canvas.width = ctx.canvas.width;
+			ctx.fillStyle = "blue";
+			ctx.beginPath();
+			ctx.arc(250, 250, 100, 0, 2 * Math.PI);
+			ctx.stroke();
+			ctx.beginPath();
+			if(round == 0)
+				ctx.arc(250, 150, ray, 0, 2 * Math.PI);
+			else if(round == 1)
+				ctx.arc(350, 250, ray, 0, 2 * Math.PI);
+			else if(round == 2)
+				ctx.arc(250, 350, ray, 0, 2 * Math.PI);
+			else if(round == 3){
+				ctx.arc(150, 250, ray, 0, 2 * Math.PI);
+				round = -1;
+			}
+			round++;
+			ctx.stroke();
+			ctx.fill();
+			//requestAnimationFrame(animate);
+			setTimeout(run, 250);
+		}
+
+		run();
+	</script>
+</html>

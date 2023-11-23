@@ -1,0 +1,100 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+body {
+	background-color: white;
+}
+#tutorial {
+	border: solid 1px black;
+}
+</style>
+	</head>
+	<body>
+		<canvas id="tutorial" width="1200" height="1000"></canvas>
+	</body>
+<script>
+
+	let animationID;
+	let star_x = 600, star_y = 400, star_ray = 80, star_color = 'yellow';
+	let circle_x = star_x, circle_y = star_y, circle_ray = 300;
+	let planet_x, planet_y, planet_ray = 30, planet_color = 'blue';
+	let moon_x, moon_y, moon_ray = 10, moon_distance = 20, moon_color = 'white';
+	let danger_ray = 20, danger_color = 'red';
+	let angle_planet = 0, angle_moon = 0;
+	let jump_planet = (2 * Math.PI) / 360;
+	let jump_moon = (2 * Math.PI) / 120;
+	let stars_x = [], stars_y = [];
+	let canvas = document.getElementById('tutorial');
+	let ctx = canvas.getContext('2d');
+	let canvas_height = 1000, canvas_width = 1200;
+
+	function run() {
+		generate_star_coordinates();
+		animationID = requestAnimationFrame(animate);
+	}
+
+	function animate() {
+		ctx.canvas.width = ctx.canvas.width;
+		ctx.fillStyle = "black";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		generate_stars();
+		ctx.fillStyle = star_color;
+		ctx.beginPath();
+		ctx.arc(star_x, star_y, star_ray, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		ctx.fillStyle = planet_color;
+		ctx.beginPath();
+	 	planet_x = circle_x + circle_ray * Math.cos(angle_planet);
+	 	planet_y = circle_y + circle_ray * Math.sin(angle_planet);
+		ctx.arc(planet_x, planet_y, planet_ray, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+	 	moon_x = planet_x + (planet_ray + moon_ray + moon_distance) * Math.cos(angle_moon);
+	 	moon_y = planet_y + (planet_ray + moon_ray + moon_distance) * Math.sin(angle_moon);
+		ctx.fillStyle = moon_color;
+		ctx.beginPath();
+		ctx.arc(moon_x, moon_y, moon_ray, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		angle_planet += jump_planet;
+		angle_moon += jump_moon;
+		if(angle_planet >= 2 * Math.PI)
+			angle_planet = 0;
+		if(angle_moon >= 2 * Math.PI)
+			angle_moon = 0;
+		requestAnimationFrame(animate);
+		//setTimeout(run, 500);
+	}
+
+	function generate_star_coordinates()
+	{
+		let number_of_stars = 250;
+		let x, y;
+		let count = 0;
+		while(count < number_of_stars) {
+			x = Math.random() * canvas_width;
+			y = Math.random() * canvas_height;
+			stars_x.push(x);
+			stars_y.push(y);
+			count ++;
+		}
+	}
+
+	function generate_stars()
+	{
+		let star_color = 'white';
+		for(let i=0;i<stars_x.length;i++) {
+			ctx.beginPath();
+			ctx.arc(stars_x[i], stars_y[i], 1, 0, 2 * Math.PI);
+			ctx.fillStyle = star_color;
+			ctx.strokeStyle = star_color;
+			ctx.stroke();
+			ctx.fill();
+		}
+	}
+
+	run();
+</script>
+</html>

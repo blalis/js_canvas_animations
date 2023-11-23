@@ -1,0 +1,69 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+	canvas {
+	  border: 1px solid black;
+		background-color: black;
+	}
+</style>
+	</head>
+	<body>
+		<button onclick="init()">Draw</button>
+		<br><br>
+		<canvas id="tutorial">TEST</canvas>
+	</body>
+<script>
+	let canvas_width=1000, canvas_height=800;
+	const canvas = document.getElementById('tutorial');
+	canvas.width = canvas_width;
+	canvas.height = canvas_height;
+	let animation;
+	let start_x, start_y;
+	let end_x, end_y;
+	let x = start_x, y = start_y;
+	let danger_ray, danger_color;
+	let frames;
+	let diff_x;
+	let diff_y;
+
+	function init() {
+		start_x = 1000;
+		start_y = Math.random() * 800;
+		end_x = 0;
+		end_y = Math.random() * 800;
+		x = start_x;
+		y = start_y;
+		danger_ray = 50;
+		danger_color = 'red';
+		frames = 100;
+		diff_x = (x - end_x) / frames;
+		diff_y = (y - end_y) / frames;
+	  animation = requestAnimationFrame(draw);
+	}
+	function draw()
+	{
+		const ctx = canvas.getContext('2d');
+		ctx.canvas.width = ctx.canvas.width;
+		let path_color = "orange";
+		ctx.fillStyle = path_color;
+		for(let i=0;i<((start_x-x)/diff_x);i++) {
+			ctx.beginPath();
+			ctx.arc(start_x - (i * diff_x), start_y - (i * diff_y), danger_ray, 0, 2 * Math.PI);
+			ctx.strokeStyle = path_color;
+			ctx.stroke();
+			ctx.fill();
+		}
+		ctx.fillStyle = danger_color;
+		ctx.beginPath();
+		ctx.arc(x, y, danger_ray, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		x -= diff_x;
+		y -= diff_y;
+		if(x >= (0 - 2 * danger_ray) && y >= (0 - 2 * danger_ray) )
+			requestAnimationFrame(draw);
+	}
+	init();
+</script>
+</html>

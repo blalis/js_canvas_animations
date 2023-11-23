@@ -1,0 +1,42 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+	canvas {
+	  border: 1px solid black;
+	}
+</style>
+	</head>
+	<body>
+		<button onclick="draw()">Draw</button>
+		<br><br>
+		<canvas id="tutorial" width="1000" height="1000">TEST</canvas>
+	</body>
+<script>
+	let start_x = 1000, start_y = 500;
+	let end_x = 0, end_y = 300;
+	let x = start_x, y = start_y;
+	let danger_ray = 50, danger_color = 'red';
+	let frames = 100;
+	let diff_x = (x - end_x) / frames;
+	let diff_y = (y - end_y) / frames;
+	function init() {
+	  requestAnimationFrame(draw);
+	}
+	function draw()
+	{
+		const canvas = document.getElementById('tutorial');
+		const ctx = canvas.getContext('2d');
+		ctx.canvas.width = ctx.canvas.width;
+		ctx.fillStyle = danger_color;
+		ctx.beginPath();
+		ctx.arc(x, y, danger_ray, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		x -= diff_x;
+		y -= diff_y;
+		requestAnimationFrame(draw);
+	}
+	init();
+</script>
+</html>

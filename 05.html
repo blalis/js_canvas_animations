@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+#tutorial {
+	border: solid 1px black;
+}
+</style>
+	</head>
+	<body>
+		<canvas id="tutorial" width="500" height="500">TEST</canvas>
+	</body>
+<script>
+		let animationID;
+		let ray = 50, planet_diff = 150;
+		let center_x = 250, center_y = 250;
+		let round = 0;
+
+		function run() {
+			animationID = requestAnimationFrame(animate);
+		}
+
+		function animate() {
+			let canvas = document.getElementById('tutorial');
+			let ctx = canvas.getContext('2d');
+			ctx.canvas.width = ctx.canvas.width;
+			ctx.fillStyle = "black";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			ctx.fillStyle = "yellow";
+			ctx.beginPath();
+			ctx.arc(center_x, center_x, ray / 2, 0, 2 * Math.PI);
+			ctx.stroke();
+			ctx.fill();
+			ctx.fillStyle = "blue";
+			ctx.beginPath();
+			if(round == 0)
+				ctx.arc(center_x, center_y - planet_diff, ray, 0, 2 * Math.PI);
+			else if(round == 1)
+				ctx.arc(center_x + planet_diff, center_y, ray, 0, 2 * Math.PI);
+			else if(round == 2)
+				ctx.arc(center_x, center_y + planet_diff, ray, 0, 2 * Math.PI);
+			else if(round == 3){
+				ctx.arc(center_x - planet_diff, center_y, ray, 0, 2 * Math.PI);
+				round = -1;
+			}
+			round++;
+			ctx.stroke();
+			ctx.fill();
+			//requestAnimationFrame(animate);
+			setTimeout(run, 250);
+		}
+
+		run();
+</script>
+</html>

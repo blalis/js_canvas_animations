@@ -1,0 +1,86 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+	canvas {
+	  border: 1px solid black;
+		background-color: black;
+	}
+.main_button {
+	font-size: 18px;
+	margin-right: 10px;
+}
+</style>
+	</head>
+	<body>
+		<button class="main_button" onclick="init()">Draw</button>
+		<button class="main_button" onclick="clear_canvas()">Clear</button>
+		<!--
+		<button onclick="finish_animation()">FINISH</button>
+		<button onclick="deaccelerate()" style="margin-left: 10px;">-</button>
+		<button onclick="accelerate()">+</button>
+		-->
+		<br><br>
+		<canvas id="tutorial"></canvas>
+	</body>
+<script>
+	let color = 'white';
+	let ray = 25;
+	let x, y;
+	let x_change, y_change, angle;
+	let max_frames, distance_per_frame, margin = 2 * ray;
+	let animationID;
+	let canvas_width=1000, canvas_height=800;
+	const canvas = document.getElementById('tutorial');
+	canvas.width = canvas_width;
+	canvas.height = canvas_height;
+	const ctx = canvas.getContext('2d');
+
+	function init()
+	{
+		if(animationID)
+			cancelAnimationFrame(animationID);
+		x = 200;
+		y = 200;
+		max_frames = 90;
+		distance_per_frame = Math.sqrt(Math.pow(canvas_width, 2) + Math.pow(canvas_height, 2)) / max_frames;
+		angle = Math.floor(Math.random() * 360);
+		console.log(angle);
+		x_change = (x + distance_per_frame * Math.cos((angle - 90) * Math.PI / 180)) - x;
+		y_change = (y + distance_per_frame * Math.sin((angle - 90) * Math.PI / 180)) - y;
+		animationID = requestAnimationFrame(draw);
+	}
+
+	function draw()
+	{
+		ctx.canvas.width = ctx.canvas.width;
+		ctx.fillStyle = color;
+		ctx.strokeStyle = color;
+		ctx.beginPath();
+		ctx.arc(x, y, ray, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		x += x_change;
+		y += y_change;
+		if((x_change > 0 && (x + ray + x_change + margin) >= canvas_width) || (x_change < 0 && (x - ray + x_change - margin) <= 0)
+		 || (y_change > 0 && (y + ray + y_change + margin) >= canvas_height) || (y_change < 0 && (y - ray + y_change - margin) <= 0)) {
+			do {
+				angle = Math.floor(Math.random() * 360);
+				x_change = (x + distance_per_frame * Math.cos((angle - 90) * Math.PI / 180)) - x;
+				y_change = (y + distance_per_frame * Math.sin((angle - 90) * Math.PI / 180)) - y;
+			} while((x_change > 0 && (x + ray + x_change + margin) >= canvas_width) || (x_change < 0 && (x - ray + x_change - margin) <= 0)
+			 || (y_change > 0 && (y + ray + y_change + margin) >= canvas_height) || (y_change < 0 && (y - ray + y_change - margin) <= 0));
+		}
+		animationID = requestAnimationFrame(draw);
+	}
+
+	function clear_canvas()
+	{
+		//ctx.canvas.width = ctx.canvas.width;
+		ctx.clearRect(0, 0, canvas_width, canvas_height);
+		star_x = [];
+	  star_y = [];
+	}
+
+</script>
+</html>
