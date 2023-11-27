@@ -1,0 +1,74 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+#tutorial {
+	border: solid 1px black;
+}
+</style>
+	</head>
+	<body>
+		<canvas id="tutorial" width="700" height="700">TEST</canvas>
+	</body>
+<script>
+
+	let canvas = document.getElementById('tutorial');
+	let ctx = canvas.getContext('2d');
+	let height = 700;
+	let width = 700;
+	let circle_diameter = height - 200;
+	let circle_ray = circle_diameter / 2;
+	let moving_object_ray = 25;
+	let moving_object_x, moving_object_y;
+	let center_x = width / 2, center_y = height / 2;
+	let angle = -90;
+	let fps = 60;
+	let animationID;
+	let saved_time = 0;
+	let frame_time;
+	let distance_per_second = circle_diameter;
+	let distance_per_frame, radian_change, angle_radian;
+
+function draw() {
+	if(saved_time == 0)
+		frame_time = 0;
+	else
+		frame_time = Date.now() - saved_time;
+	saved_time = Date.now();
+	distance_per_frame = distance_per_second * frame_time / 1000;
+	angle_per_frame = distance_per_frame * 360 / (2 * Math.PI * circle_ray);
+	angle += angle_per_frame;
+	if(angle >= 360)
+		angle -= 360;
+ 	angle_radian = get_radian(angle);
+	ctx.canvas.width = ctx.canvas.width;
+	ctx.fillStyle = "blue";
+	/*
+	ctx.beginPath();
+	ctx.arc(center_x, center_y, circle_ray, 0, 2 * Math.PI);
+	ctx.stroke();
+	// ctx.fill();
+	*/
+	moving_object_x = center_x + circle_ray * Math.cos(angle_radian);
+	moving_object_y = center_y + circle_ray * Math.sin(angle_radian);
+
+	ctx.beginPath();
+	ctx.arc(moving_object_x, moving_object_y, moving_object_ray, 0, 2 * Math.PI);
+	ctx.stroke();
+	ctx.fill();
+	animationID = requestAnimationFrame(draw);
+}
+
+	function get_radian(angle)
+	{
+		return angle * (Math.PI / 180);
+	}
+
+	function get_angle_from_radian(radian)
+	{
+		return radian * (180 / Math.PI);
+	}
+
+draw();
+</script>
+</html>

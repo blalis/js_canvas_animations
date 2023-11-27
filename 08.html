@@ -40,11 +40,13 @@ body {
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		generate_stars();
 		ctx.fillStyle = star_color;
+		ctx.strokeStyle = star_color;
 		ctx.beginPath();
 		ctx.arc(star_x, star_y, star_ray, 0, 2 * Math.PI);
 		ctx.stroke();
 		ctx.fill();
 		ctx.fillStyle = planet_color;
+		ctx.strokeStyle = planet_color;
 		ctx.beginPath();
 	 	planet_x = circle_x + circle_ray * Math.cos(angle_planet);
 	 	planet_y = circle_y + circle_ray * Math.sin(angle_planet);
@@ -54,6 +56,7 @@ body {
 	 	moon_x = planet_x + (planet_ray + moon_ray + moon_distance) * Math.cos(angle_moon);
 	 	moon_y = planet_y + (planet_ray + moon_ray + moon_distance) * Math.sin(angle_moon);
 		ctx.fillStyle = moon_color;
+		ctx.strokeStyle = moon_color;
 		ctx.beginPath();
 		ctx.arc(moon_x, moon_y, moon_ray, 0, 2 * Math.PI);
 		ctx.stroke();

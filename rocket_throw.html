@@ -1,0 +1,279 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<style>
+			#tutorial {
+				border: solid 1px black;
+			}
+			.main_button {
+				font-size: 18px;
+				margin-right: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<button class="main_button" onclick="draw()">Draw</button>
+		<button class="main_button" onclick="finish_animation()">Finish</button>
+		<button class="main_button" onclick="clear_canvas()">Clear</button>
+		<br><br>
+		<canvas id="tutorial" width="1800" height="800">TEST</canvas>
+	</body>
+	<script>
+
+		let canvas_width=1800, canvas_height=800;
+		let canvas = document.getElementById('tutorial');
+		let ctx = canvas.getContext('2d');
+		let animationID;
+		let bomb_ray = 10, throw_ray = 700;
+		let trajectory_angle = Math.PI, trajectory_angle_change = (2 * Math.PI) / 1000;
+		let rocket_move_angle;
+		let bomb_x = 50, bomb_y = canvas_height;
+		let fireball_x;
+		let fireball_y = canvas_height, fireball_y_up_change = 1;
+		let fireball_ray_start = 10, fireball_ray = fireball_ray_start, fireball_ray_change = 0.3;
+		let fireball_color = '#e25822';
+		let phase = '';
+
+		function draw() {
+			cancelAnimationFrame(animationID);
+			bomb_ray = 20;
+			throw_ray = 700;
+			trajectory_angle = Math.PI;
+			bomb_x = 50;
+			bomb_y = canvas_height;
+			fireball_y = canvas_height;
+			fireball_ray = fireball_ray_start;
+			fireball_color = '#e25822';
+			phase = '';
+			missile_throw();
+		}
+
+		function missile_throw() {
+ 			bomb_x = 50 + throw_ray + throw_ray * Math.cos(trajectory_angle);
+ 			bomb_y = canvas_height + throw_ray * Math.sin(trajectory_angle);
+			rocket_move_angle = get_angle_from_radian(trajectory_angle);
+			draw_sky();
+			// ctx.canvas.width = ctx.canvas.width;
+			ctx.fillStyle = "black";
+			// ctx.fillRect(bomb_x - 5, bomb_y + 20, 20, 10);
+			draw_rocket(bomb_x, bomb_y, 100, 20, rocket_move_angle, 'up', 1);
+			/*
+			ctx.beginPath();
+			ctx.arc(bomb_x, bomb_y, bomb_ray, 0, 2 * Math.PI);
+			ctx.stroke();
+			ctx.fill();
+			*/
+			/*
+			ctx.strokeStyle = "blue";
+			ctx.beginPath();
+			ctx.arc(50 + throw_ray, canvas_height, throw_ray, 0, 2 * Math.PI);
+			ctx.stroke();
+			*/
+			if(trajectory_angle >= (2 * 3.14)) {
+			// if(bomb_x > 50 + throw_ray && bomb_y + bomb_ray >= canvas_height - 1) {
+				fireball_x = bomb_x;
+				// cancelAnimationFrame(animationID);
+				// fire_ball();
+				return 0;
+			}
+			trajectory_angle += trajectory_angle_change;
+			animationID = requestAnimationFrame(missile_throw);
+		}
+
+	function fire_ball() {
+		draw_sky();
+		ctx.fillStyle = fireball_color;
+		ctx.strokeStyle = fireball_color;
+		ctx.beginPath();
+		ctx.arc(fireball_x , fireball_y, fireball_ray, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		if(fireball_ray >= 5 * fireball_ray_start) {
+			// cancelAnimationFrame(animationID);
+			phase = 'fire_mushroom';
+			fire_ball_up();
+			return 0;
+		}
+		fireball_ray += fireball_ray_change;
+		animationID = requestAnimationFrame(fire_ball);
+	}
+
+	function fire_ball_up() {
+		draw_sky();
+		ctx.fillStyle = fireball_color;
+		ctx.strokeStyle = fireball_color;
+		ctx.beginPath();
+		ctx.arc(fireball_x , fireball_y, fireball_ray, get_radian(0), get_radian(360));
+		ctx.stroke();
+		ctx.fill();
+		/*
+		ctx.fillStyle = 'red';
+		ctx.beginPath();
+		ctx.arc(fireball_x , fireball_y, 0.8 * fireball_ray, get_radian(0), get_radian(360));
+		ctx.stroke();
+		ctx.fill();
+		ctx.fillStyle = fireball_color;
+		*/
+		if(fireball_y <= canvas_height - fireball_ray * 1.5) {
+			create_many_balls_in_circle(fireball_x , fireball_y, fireball_ray, fireball_ray / 8, 32);
+			ctx.fillRect(fireball_x - fireball_ray / 3, fireball_y, fireball_ray / 1.5, canvas_height);
+			ctx.beginPath();
+			ctx.arc(fireball_x, canvas_height + 1.6 * fireball_ray, fireball_ray * 2, get_radian(180), get_radian(360));
+			ctx.stroke();
+			ctx.fill();
+			create_many_balls_in_circle(fireball_x, canvas_height + 1.6 * fireball_ray, fireball_ray * 2, fireball_ray / 25, 200);
+			// fireball_ray += 1;
+		}
+		if(fireball_y <= fireball_ray + 50) {
+			// cancelAnimationFrame(animationID);
+			if(phase == 'fire_mushroom')	{
+				fireball_color = '#404040';
+				phase = 'dark_mushroom';
+				setTimeout(fire_ball_up, 2000);
+			}
+			else if(phase == 'dark_mushroom') {
+				fireball_color = '#F5F5F5';
+				phase = 'white_mushroom';
+				setTimeout(fire_ball_up, 5000);
+			}
+			return 0;
+		}
+		fireball_y -= fireball_y_up_change;
+		fireball_ray += fireball_ray_change;
+		// clear_canvas();
+		animationID = requestAnimationFrame(fire_ball_up);
+	}
+
+	function create_many_balls_in_circle(center_x, center_y, center_ray, ray, how_many) {
+		let change = 360 / how_many;
+		for(let i=0;i<=360;i+=change) {
+			ctx.beginPath();
+			x = center_x + (center_ray *  Math.cos(get_radian(i)));
+			y = center_y + (center_ray *  Math.sin(get_radian(i)));
+			ctx.arc(x, y, ray, get_radian(0), get_radian(360));
+			ctx.stroke();
+			ctx.fill();
+		}
+	}
+
+	function get_radian(angle)
+	{
+		return angle * (Math.PI / 180);
+	}
+
+	function get_angle_from_radian(radian)
+	{
+		return radian * (180 / Math.PI);
+	}
+
+	function get_distant_point(x, y, distance, angle)
+	{
+		x = x + (distance * Math.cos(get_radian(angle)));
+		y = y + (distance * Math.sin(get_radian(angle)));
+		return {'x': x, 'y': y};
+	}
+
+	function get_relation_between_points(x1, y1, x2, y2)
+	{
+		let distance, angle, x, y;
+		distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+		for(angle=0;angle<360;angle++) {
+			x = x1 + (distance * Math.cos(get_radian(angle)));
+			y = y1 + (distance * Math.sin(get_radian(angle)));
+			if(x == x2 && y == y2)
+				return {'distance': distance, 'angle': angle};
+		}
+		return {};
+	}
+
+	function create_rect_using_angle(x, y, height, width, angle, direction, fill)
+	{
+		let point;
+		let points = [];
+		ctx.beginPath();
+		ctx.moveTo(x, y);
+		point = get_distant_point(x, y, width, angle);
+		points.push(point);
+		ctx.lineTo(point['x'], point['y']);
+		if(direction == 'down') {
+			point = get_distant_point(point['x'], point['y'], height, angle + 90);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+			point = get_distant_point(point['x'], point['y'], width, angle + 180);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+			point = get_distant_point(point['x'], point['y'], height, angle + 270);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+		}
+		else {
+			point = get_distant_point(point['x'], point['y'], height, angle - 90);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+			point = get_distant_point(point['x'], point['y'], width, angle - 180);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+			point = get_distant_point(point['x'], point['y'], height, angle - 270);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+		}
+		ctx.stroke();
+		if(fill == 1)
+			ctx.fill();
+		return points;
+	}
+
+	function draw_rocket(x, y, height, width, angle, direction, fill) {
+		let point;
+		let points = [];
+		ctx.beginPath();
+		ctx.moveTo(x, y);
+		point = get_distant_point(x, y, width, angle);
+		points.push(point);
+		ctx.lineTo(point['x'], point['y']);
+		if(direction == 'down') {
+			point = get_distant_point(point['x'], point['y'], height, angle + 90);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+			point = get_distant_point(point['x'], point['y'], width, angle + 180);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+			point = get_distant_point(point['x'], point['y'], height, angle + 270);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+		}
+		else {
+			point = get_distant_point(point['x'], point['y'], height, angle - 90);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+			point = get_distant_point(point['x'], point['y'], width, angle - 180);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+			point = get_distant_point(point['x'], point['y'], height, angle - 270);
+			points.push(point);
+			ctx.lineTo(point['x'], point['y']);
+			ctx.moveTo(points[0]['x'], points[0]['y']);
+			point = get_distant_point(points[0]['x'], points[0]['y'], get_triangle_side_length(width, 60), angle + 120);
+			ctx.lineTo(point['x'], point['y']);
+			ctx.lineTo(points[3]['x'], points[3]['y']);
+		}
+		ctx.stroke();
+		if(fill == 1)
+			ctx.fill();
+		return points;
+	}
+
+	function get_triangle_side_length(base_length, angle) {
+		return Math.abs((0.5 * base_length) / Math.cos(get_radian(angle)));
+	}
+
+	function draw_sky() {
+		ctx.canvas.width = ctx.canvas.width;
+		ctx.fillStyle = "#87CEFA";
+		ctx.fillRect(0, 0, canvas_width, canvas_height);
+	}
+
+	draw();
+
+	</script>
+</html>

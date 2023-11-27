@@ -1,0 +1,128 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+#tutorial {
+	border: solid 1px black;
+}
+</style>
+	</head>
+	<body>
+		<canvas id="tutorial" width="1500" height="800">TEST</canvas>
+	</body>
+	<script>
+
+		let canvas_width=1500, canvas_height=800;
+		let canvas = document.getElementById('tutorial');
+		let ctx = canvas.getContext('2d');
+		let animationID;
+		let bomb_ray = 10, throw_ray = 500;
+		let trajectory_angle = Math.PI, trajectory_angle_change = (2 * Math.PI) / 180;
+		let bomb_x = 50, bomb_y = canvas_height;
+		let fireball_x;
+		let fireball_y = canvas_height, fireball_y_up_change = 1;
+		let fireball_ray_start = 10, fireball_ray = fireball_ray_start, fireball_ray_change = 0.3;
+		let fireball_color = '#e25822';
+
+		function draw() {
+			missile_throw();
+
+		}
+
+		function missile_throw() {
+ 			bomb_x = 50 + throw_ray + throw_ray * Math.cos(trajectory_angle);
+ 			bomb_y = canvas_height + throw_ray * Math.sin(trajectory_angle);
+			ctx.canvas.width = ctx.canvas.width;
+			ctx.fillStyle = "black";
+			ctx.beginPath();
+			ctx.arc(bomb_x, bomb_y, bomb_ray, 0, 2 * Math.PI);
+			ctx.stroke();
+			ctx.fill();
+			/*
+			ctx.strokeStyle = "blue";
+			ctx.beginPath();
+			ctx.arc(50 + throw_ray, canvas_height, throw_ray, 0, 2 * Math.PI);
+			ctx.stroke();
+			*/
+			console.log(fireball_x);
+			if(trajectory_angle >= (2 * 3.14)) {
+			// if(bomb_x > 50 + throw_ray && bomb_y + bomb_ray >= canvas_height - 1) {
+				fireball_x = bomb_x;
+				// cancelAnimationFrame(animationID);
+				fire_ball();
+				return 0;
+			}
+			trajectory_angle += trajectory_angle_change;
+			animationID = requestAnimationFrame(missile_throw);
+		}
+
+	function fire_ball() {
+		ctx.fillStyle = fireball_color;
+		ctx.strokeStyle = fireball_color;
+		ctx.beginPath();
+		ctx.arc(fireball_x , fireball_y, fireball_ray, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		if(fireball_ray >= 5 * fireball_ray_start) {
+			// cancelAnimationFrame(animationID);
+			fire_ball_up();
+			return 0;
+		}
+		fireball_ray += fireball_ray_change;
+		animationID = requestAnimationFrame(fire_ball);
+	}
+
+	function fire_ball_up() {
+		ctx.canvas.width = ctx.canvas.width;
+		ctx.fillStyle = fireball_color;
+		ctx.strokeStyle = fireball_color;
+		ctx.beginPath();
+		ctx.arc(fireball_x , fireball_y, fireball_ray, get_radian(0), get_radian(360));
+		ctx.stroke();
+		ctx.fill();
+		if(fireball_y <= canvas_height - fireball_ray * 1.5) {
+			create_many_balls_in_circle(fireball_x , fireball_y, fireball_ray, fireball_ray / 10, 32);
+			ctx.fillRect(fireball_x - fireball_ray / 3, fireball_y, fireball_ray / 1.5, canvas_height);
+			ctx.beginPath();
+			ctx.arc(fireball_x, canvas_height + fireball_ray / 2, fireball_ray / 1.3, get_radian(180), get_radian(360));
+			ctx.stroke();
+			ctx.fill();
+			create_many_balls_in_circle(fireball_x, canvas_height + fireball_ray / 2, fireball_ray / 1.3, fireball_ray / 6, 25);
+			// fireball_ray += 1;
+		}
+		if(fireball_y <= fireball_ray + 50) {
+			// cancelAnimationFrame(animationID);
+			return 0;
+		}
+		fireball_y -= fireball_y_up_change;
+		fireball_ray += fireball_ray_change;
+		// clear_canvas();
+		animationID = requestAnimationFrame(fire_ball_up);
+	}
+
+	function create_many_balls_in_circle(center_x, center_y, center_ray, ray, how_many) {
+		let change = 360 / how_many;
+		for(let i=0;i<=360;i+=change) {
+			ctx.beginPath();
+			x = center_x + (center_ray *  Math.cos(get_radian(i)));
+			y = center_y + (center_ray *  Math.sin(get_radian(i)));
+			ctx.arc(x, y, ray, get_radian(0), get_radian(360));
+			ctx.stroke();
+			ctx.fill();
+		}
+	}
+
+	function get_radian(angle)
+	{
+		return angle * (Math.PI / 180);
+	}
+
+	function get_angle_from_radian(radian)
+	{
+		return radian * (180 / Math.PI);
+	}
+
+	draw();
+
+	</script>
+</html>
