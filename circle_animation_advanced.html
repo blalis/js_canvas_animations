@@ -39,6 +39,7 @@
 	let distance_per_second = circle_diameter;
 	let distance_per_frame, radian_change, angle_radian;
 	let speed_change = 50;
+	let run = 1;
 
 	function draw() {
 		if(saved_time == 0)
@@ -48,17 +49,19 @@
 		saved_time = Date.now();
 		distance_per_frame = distance_per_second * frame_time / 1000;
 		angle_per_frame = distance_per_frame * 360 / (2 * Math.PI * circle_ray);
-		if(clockwise == 1) {
-			angle += angle_per_frame;
-			if(angle >= 360)
-				angle -= 360;
+		if(run == 1) {
+			if(clockwise == 1) {
+				angle += angle_per_frame;
+				if(angle >= 360)
+					angle -= 360;
+				}
+			else {
+				angle -= angle_per_frame;
+				if(angle <= 0)
+					angle += 360;
 			}
-		else {
-			angle -= angle_per_frame;
-			if(angle <= 0)
-				angle += 360;
+		 	angle_radian = get_radian(angle);
 		}
-	 	angle_radian = get_radian(angle);
 		ctx.canvas.width = ctx.canvas.width;
 		ctx.fillStyle = "blue";
 		if(show_path == 1) {
@@ -75,7 +78,8 @@
 		ctx.arc(moving_object_x, moving_object_y, moving_object_ray, 0, 2 * Math.PI);
 		ctx.stroke();
 		ctx.fill();
-		animationID = requestAnimationFrame(draw);
+		if(run == 1)
+			animationID = requestAnimationFrame(draw);
 	}
 
 	function get_radian(angle)
@@ -112,15 +116,19 @@
 			show_path = 1;
 		else
 			show_path = 0;
+		draw();
 	}
 
 	function start_animation() {
+		cancelAnimationFrame(animationID);
+		run = 1;
 		saved_time = Date.now();
 		draw();
 	}
 
 	function stop_animation() {
 		cancelAnimationFrame(animationID);
+		run = 0;
 	}
 
 	draw();
