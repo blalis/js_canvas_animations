@@ -1,0 +1,59 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<style>
+			body {
+				background-color: black;
+			}
+			#tutorial {
+				border: solid 1px black;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="tutorial" width="1000" height="1000"></canvas>
+	</body>
+<script>
+
+let animationID;
+let star_x=600, star_y=400, star_ray=80, star_color='yellow';
+let circle_x=star_x, circle_y=star_y, circle_ray=300;
+let planet_x, planet_y, planet_ray=30, planet_color='blue';
+let angle = 0;
+let jump = (2 * Math.PI) / 360;
+
+function run() {
+	animationID = requestAnimationFrame(animate);
+}
+
+function animate() {
+	let canvas = document.getElementById('tutorial');
+	let ctx = canvas.getContext('2d');
+	ctx.canvas.width = ctx.canvas.width;
+	ctx.fillStyle = "black";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = star_color;
+	ctx.beginPath();
+	ctx.arc(star_x, star_y, star_ray, 0, 2 * Math.PI);
+	ctx.stroke();
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(circle_x, circle_y, circle_ray, 0, 2 * Math.PI);
+	ctx.stroke();
+	ctx.beginPath();
+ 	planet_x = circle_x + circle_ray * Math.cos(angle);
+ 	planet_y = circle_y + circle_ray * Math.sin(angle);
+	ctx.fillStyle = planet_color;
+	ctx.arc(planet_x, planet_y, planet_ray, 0, 2 * Math.PI);
+	ctx.stroke();
+	ctx.fill();
+	angle += jump;
+	if(angle >= 2 * Math.PI)
+		angle = 0;
+	requestAnimationFrame(animate);
+	//setTimeout(run, 500);
+}
+
+run();
+</script>
+</html>

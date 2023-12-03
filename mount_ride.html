@@ -1,0 +1,212 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+<style>
+	canvas {
+	  border: 1px solid black;
+		background-color: black;
+	}
+	.main_button {
+		font-size: 16px;
+		margin-right: 5px;
+		// text-align: center;
+		// max-width: auto;
+	}
+	.main_button_no_margin {
+		font-size: 18px;
+	}
+	#angle_text_input {
+		width: 50px;
+		font-size: 18px;
+	}
+</style>
+	</head>
+	<body>
+		<input type="button" class="main_button" value="UP" onclick="move_up()"/>
+		<input type="button" class="main_button" value="DOWN" onclick="move_down()"/>
+		<input type="button" class="main_button" value="Single run" onclick="single_move()"/>
+		<input type="button" class="main_button" value="Up and down" onclick="move_both_ways()"/>
+		<input type="button" class="main_button" value="AUTO" onclick="auto_move()"/>
+		<input type="button" class="main_button" value="Clear" onclick="clear_run()"/>
+		<br><br>
+		<canvas id="canvas" height="600px" width="800px" style="background: url('./image/mount_ride_2.png'); background-size: 800px 600px;"></canvas>
+	</body>
+<script>
+	let html_el = document.getElementById("canvas");
+	let canvas_width = html_el.width, canvas_height=html_el.height;
+	const canvas = document.getElementById('canvas');
+	canvas.width = canvas_width;
+	canvas.height = canvas_height;
+	const ctx = canvas.getContext('2d');
+	let distance_per_second = 200;
+	let delay_between_runs = 1000;
+	let start_x = 30, start_y = 530;
+	let end_x = 560, end_y = 55;
+	let direction = 'up';
+	let position_x = start_x, position_y = start_y;
+	let point;
+	let saved_time = 0;
+	let frame_time;
+	let auto_move_control = 0;
+	let run = 1;
+	let animationID;
+	let line_info = get_relation_between_points(start_x, start_y, end_x, end_y);
+	// console.log(line_info);
+	let line_distance = line_info.distance;
+	let line_angle = line_info.angle;
+
+	function move() {
+		// time, speed
+		if(saved_time == 0)
+			frame_time = 0;
+		else
+			frame_time = Date.now() - saved_time;
+		saved_time = Date.now();
+		distance_per_frame = distance_per_second * frame_time / 1000;
+		if(direction == 'up')
+			point = get_distant_point(position_x, position_y, distance_per_frame, line_angle);
+		else
+			point = get_distant_point(position_x, position_y, distance_per_frame, line_angle + 180);
+		position_x = point.x;
+		position_y = point.y;
+		ctx.canvas.width = ctx.canvas.width;
+		// draw static background
+		draw_background();
+		// draw_vehicle();
+		ctx.beginPath();
+		ctx.moveTo(position_x, position_y);
+		point = get_distant_point(position_x, position_y, 2, line_angle + 90);
+		ctx.lineTo(point.x, point.y);
+		point = get_distant_point(point.x, point.y, 10, line_angle);
+		ctx.lineTo(point.x, point.y);
+		point = get_distant_point(point.x, point.y, 10, line_angle + 90);
+		ctx.lineTo(point.x, point.y);
+		point = get_distant_point(point.x, point.y, 2 * 10, line_angle + 180);
+		ctx.lineTo(point.x, point.y);
+		point = get_distant_point(point.x, point.y, 10, line_angle - 90);
+		ctx.lineTo(point.x, point.y);
+		point = get_distant_point(point.x, point.y, 10, line_angle);
+		ctx.lineTo(point.x, point.y);
+		ctx.stroke();
+		ctx.fill();
+		if(
+				(direction == 'up' && position_x >= end_x && position_y <= end_y)
+				||
+				(direction == 'down' && position_x <= start_x && position_y >= start_y)
+			) {
+			cancelAnimationFrame(animationID);
+			change_direction();
+			/*
+			if(direction == 'down')
+				move();
+			*/
+			// saved_time = Date.now();
+			if(auto_move_control == 1) {
+				saved_time = 0;
+				setTimeout(move, delay_between_runs);
+			}
+			saved_time = 0;
+			return 0;
+		}
+		if(run == 1)
+			animationID = requestAnimationFrame(move);
+		return 0;
+	}
+
+	function change_direction() {
+		if(direction == 'up')
+			direction = 'down';
+		else
+			direction = 'up';
+	}
+
+	function move_up() {
+		direction = 'up';
+		run = 1;
+		move();
+	}
+
+	function move_down() {
+		direction = 'down';
+		run = 1;
+		move();
+	}
+
+	function single_move() {
+		run = 1;
+		move();
+	}
+
+	async function move_both_ways() {
+		Promise.resolve(move()).then(() => {
+		  move()
+		});
+	}
+
+	function auto_move() {
+		saved_time = 0;
+		if(auto_move_control == 1) {
+			auto_move_control = 0;
+			cancelAnimationFrame(animationID);
+			run = 0;
+		}
+		else {
+			auto_move_control = 1;
+			run = 1;
+			move();
+		}
+	}
+
+	function clear_run() {
+		cancelAnimationFrame(animationID);
+		run = 0;
+		saved_time = 0;
+		auto_move_control = 0;
+		ctx.canvas.width = ctx.canvas.width;
+		draw_background();
+		position_x = start_x;
+		position_y = start_y;
+		direction = 'up';
+		run = 1;
+	}
+
+	function draw_background() {
+		ctx.moveTo(0, start_y);
+		ctx.lineTo(start_x, start_y);
+		ctx.lineTo(end_x, end_y);
+		ctx.stroke();
+		point = get_distant_point(start_x, start_y, 100, line_angle);
+		ctx.moveTo(point.x, point.y);
+		ctx.lineTo(point.x, canvas_height);
+		ctx.stroke();
+	}
+
+	function get_radian(angle)
+	{
+		return angle * (Math.PI / 180);
+	}
+
+	function get_angle_from_radian(radian)
+	{
+		return radian * (180 / Math.PI);
+	}
+
+	function get_distant_point(x, y, distance, angle)
+	{
+		x = x + (distance * Math.cos(get_radian(angle)));
+		y = y + (distance * Math.sin(get_radian(angle)));
+		return {'x': x, 'y': y};
+	}
+
+	function get_relation_between_points(x1, y1, x2, y2)
+	{
+		let distance, angle, x, y;
+		distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+		angle = get_angle_from_radian(Math.atan((y2 - y1) / (x2 - x1)));
+		return {'distance': distance, 'angle': angle};
+	}
+
+	// move();
+	draw_background();
+</script>
+</html>
