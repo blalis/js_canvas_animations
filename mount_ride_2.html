@@ -44,7 +44,7 @@
 	let end_x = 560, end_y = 55;
 	let vehicle_height = 10, vehicle_length = 20, connection = 2;
 	let direction = 'up';
-	let position_x = start_x, position_y = start_y;
+	let position_x = vehicle_length / 2, position_y = start_y;
 	let point;
 	let saved_time = 0;
 	let frame_time;
@@ -60,27 +60,34 @@
 
 	function move() {
 		// time, speed
+		let angle;
 		if(saved_time == 0)
 			frame_time = 0;
 		else
 			frame_time = Date.now() - saved_time;
 		saved_time = Date.now();
 		distance_per_frame = distance_per_second * frame_time / 1000;
-		if(direction == 'up')
-			point = get_distant_point(position_x, position_y, distance_per_frame, line_angle);
+		if(position_x <= start_x) {
+			position_y = start_y;
+			angle = 0;
+		}
 		else
-			point = get_distant_point(position_x, position_y, distance_per_frame, line_angle + 180);
+			angle = line_angle;
+		if(direction != 'up')
+			angle += 180;
+		point = get_distant_point(position_x, position_y, distance_per_frame, angle);
 		position_x = point.x;
 		position_y = point.y;
 		ctx.canvas.width = ctx.canvas.width;
 		// draw static background
 		draw_background();
 		// draw a moving object
-		draw_machine();
+		if(position_x < end_x && position_y > end_y)
+			draw_machine();
 		if(
 				(direction == 'up' && position_x >= end_x && position_y <= end_y)
 				||
-				(direction == 'down' && position_x <= start_x && position_y >= start_y)
+				(direction == 'down' && position_x <= (vehicle_length / 2) && position_y >= start_y)
 			) {
 			cancelAnimationFrame(animationID);
 			change_direction();
@@ -148,9 +155,10 @@
 		saved_time = 0;
 		auto_move_control = 0;
 		ctx.canvas.width = ctx.canvas.width;
-		position_x = start_x;
+		position_x = vehicle_length / 2;
 		position_y = start_y;
 		draw_background();
+		draw_machine();
 		direction = 'up';
 		run = 1;
 		double_ride = 0;
@@ -161,37 +169,47 @@
 		ctx.lineTo(start_x, start_y);
 		ctx.lineTo(end_x, end_y);
 		ctx.stroke();
-		/*
-		point = get_distant_point(start_x, start_y, 100, line_angle);
-		ctx.moveTo(point.x, point.y);
-		ctx.lineTo(point.x, canvas_height);
-		ctx.stroke();
-		*/
 		ctx.beginPath();
-		ctx.moveTo(0, start_y + vehicle_height + connection);
-		ctx.lineTo(start_x, start_y + vehicle_height + connection);
+		ctx.moveTo(0, start_y + vehicle_height + connection + 1);
+		ctx.lineTo(start_x, start_y + vehicle_height + connection + 1);
 		ctx.lineTo(start_x, canvas_height);
 		ctx.lineTo(0, canvas_height);
 		// ctx.stroke();
 		ctx.fill();
-		draw_machine();
 	}
 
 	function draw_machine() {
 		ctx.beginPath();
 		ctx.moveTo(position_x, position_y);
-		point = get_distant_point(position_x, position_y, connection, line_angle + 90);
-		ctx.lineTo(point.x, point.y);
-		point = get_distant_point(point.x, point.y, vehicle_length / 2, line_angle);
-		ctx.lineTo(point.x, point.y);
-		point = get_distant_point(point.x, point.y, vehicle_height, line_angle + 90);
-		ctx.lineTo(point.x, point.y);
-		point = get_distant_point(point.x, point.y, vehicle_length, line_angle + 180);
-		ctx.lineTo(point.x, point.y);
-		point = get_distant_point(point.x, point.y, vehicle_height, line_angle - 90);
-		ctx.lineTo(point.x, point.y);
-		point = get_distant_point(point.x, point.y, vehicle_length / 2, line_angle);
-		ctx.lineTo(point.x, point.y);
+		if(position_x <= start_x) {
+			// ctx.moveTo(position_x, start_y);
+			point = get_distant_point(position_x, position_y, connection, 90);
+			ctx.lineTo(point.x, point.y);
+			point = get_distant_point(point.x, point.y, vehicle_length / 2, 0);
+			ctx.lineTo(point.x, point.y);
+			point = get_distant_point(point.x, point.y, vehicle_height, 90);
+			ctx.lineTo(point.x, point.y);
+			point = get_distant_point(point.x, point.y, vehicle_length, 180);
+			ctx.lineTo(point.x, point.y);
+			point = get_distant_point(point.x, point.y, vehicle_height, -90);
+			ctx.lineTo(point.x, point.y);
+			point = get_distant_point(point.x, point.y, vehicle_length / 2, 0);
+			ctx.lineTo(point.x, point.y);
+		}
+		else {
+			point = get_distant_point(position_x, position_y, connection, line_angle + 90);
+			ctx.lineTo(point.x, point.y);
+			point = get_distant_point(point.x, point.y, vehicle_length / 2, line_angle);
+			ctx.lineTo(point.x, point.y);
+			point = get_distant_point(point.x, point.y, vehicle_height, line_angle + 90);
+			ctx.lineTo(point.x, point.y);
+			point = get_distant_point(point.x, point.y, vehicle_length, line_angle + 180);
+			ctx.lineTo(point.x, point.y);
+			point = get_distant_point(point.x, point.y, vehicle_height, line_angle - 90);
+			ctx.lineTo(point.x, point.y);
+			point = get_distant_point(point.x, point.y, vehicle_length / 2, line_angle);
+			ctx.lineTo(point.x, point.y);
+		}
 		ctx.stroke();
 		ctx.fill();
 	}
@@ -221,7 +239,7 @@
 		return {'distance': distance, 'angle': angle};
 	}
 
-	// move();
 	draw_background();
+	draw_machine();
 </script>
 </html>
