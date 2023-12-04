@@ -17,6 +17,7 @@
 		<button class="main_button" onclick="move('NW')">NW</button>
 		<button class="main_button" onclick="move('N')">N</button>
 		<button class="main_button" onclick="move('NE')">NE</button>
+		<button style="font-size: 16px; margin-left: 15px;" onclick="send_rocket()">Send a rocket</button>
 		<br>
 		<button class="main_button" onclick="move('W')">W</button>
 		<button class="main_button" onclick="send_rocket()">C</button>
@@ -46,8 +47,9 @@
 	let water_level = canvas_height - 300, sand_level = 20;
 	let x = canvas_width - 500, y = canvas_height - 60;
 	let x_change, y_change, angle;
-	let rocket_height = submarine_height - 10, rocket_width = rocket_height / 5;
-	let rocket_water_speed_per_second = 120, rocket_air_speed_per_second = 600;
+	let rocket_submarine_heigh_diff = 10;
+	let rocket_height = submarine_height - rocket_submarine_heigh_diff, rocket_width = rocket_height / 5;
+	let rocket_water_distance_per_second = 120, rocket_air_distance_per_second = 600;
 	let rocket_x, rocket_y;
 	let max_frames, distance_per_frame;
 	let animationID;
@@ -217,9 +219,9 @@
 		let distance_per_frame;
 		let distance_per_second;
 		if(rocket_y + rocket_height >= canvas_height - water_level)
-			distance_per_second = rocket_water_speed_per_second;
+			distance_per_second = rocket_water_distance_per_second;
 		else
-			distance_per_second = rocket_air_speed_per_second;
+			distance_per_second = rocket_air_distance_per_second;
 		distance_per_frame = distance_per_second * frame_time / 1000;
 		let x_fields = [30, 50, 70, 90, 110];
 		if(! rocket_x)
@@ -227,7 +229,7 @@
 		if(rocket_y)
 			rocket_y -= distance_per_frame;
 		else
-			rocket_y = y - 5 + submarine_height / 2;
+			rocket_y = y - rocket_submarine_heigh_diff / 2 + submarine_height / 2;
 		// ctx.canvas.width = ctx.canvas.width;
 		draw();
 		ctx.fillStyle = 'black';
@@ -242,6 +244,7 @@
 			rocket_x = null;
 			rocket_y = null;
 			saved_time = 0;
+			cancelAnimationFrame(animationID);
 			return 0;
 		}
 		animationID = requestAnimationFrame(send_rocket);
